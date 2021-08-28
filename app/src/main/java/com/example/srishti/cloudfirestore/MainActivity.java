@@ -7,11 +7,16 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -24,8 +29,10 @@ public class MainActivity extends AppCompatActivity {
 
     private EditText titleET;
     private EditText descriptionET;
+    private TextView dataTV;
 
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private CollectionReference reference = db.collection("Notebook");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,11 +41,18 @@ public class MainActivity extends AppCompatActivity {
 
         titleET = findViewById(R.id.edit_text_title);
         descriptionET = findViewById(R.id.edit_text_description);
+        dataTV = findViewById(R.id.text_view_data);
 
         findViewById(R.id.button_save).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 saveNote();
+            }
+        });
+        findViewById(R.id.button_load).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                loadNote();
             }
         });
     }
@@ -61,6 +75,30 @@ public class MainActivity extends AppCompatActivity {
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull @org.jetbrains.annotations.NotNull Exception e) {
+                        Toast.makeText(MainActivity.this, "Error!", Toast.LENGTH_SHORT).show();
+                        Log.d(TAG, e.toString());
+                    }
+                });
+    }
+
+    private void loadNote(){
+        reference.document("Note 1").get()
+                .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                    @Override
+                    public void onSuccess(DocumentSnapshot documentSnapshot) {
+                        if(documentSnapshot.exists()){
+                            Map<String, Object> note = documentSnapshot.getData();
+                            dataTV.setText("Title: " + note.get(KEY_TITLE) + "\n" +
+                            "Description: " + note.get(KEY_DESCRIPTION));
+
+                        }else {
+                            Toast.makeText(MainActivity.this, "Document does not exist", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull @NotNull Exception e) {
                         Toast.makeText(MainActivity.this, "Error!", Toast.LENGTH_SHORT).show();
                         Log.d(TAG, e.toString());
                     }
