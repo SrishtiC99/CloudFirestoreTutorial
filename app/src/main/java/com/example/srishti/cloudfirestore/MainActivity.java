@@ -113,9 +113,11 @@ public class MainActivity extends AppCompatActivity {
 
     private void loadNotes(){
         reference.whereGreaterThanOrEqualTo("priority", 2)
+                .whereEqualTo("title", "title")
                 .limit(3)
                 .orderBy("priority", Query.Direction.DESCENDING)
-                .get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                .get()
+                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
             @Override
             public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
                 String data = "";
@@ -127,6 +129,12 @@ public class MainActivity extends AppCompatActivity {
                             "Id: " + note.getId() + "\n" + "Title: " +  note.getTitle() + "\n" + "Description: " + note.getDescription() + "\n\n";
                 }
                 dataTV.setText(data);
+            }
+        })
+        .addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull @NotNull Exception e) {
+                Log.d(TAG, e.toString());
             }
         });
     }
