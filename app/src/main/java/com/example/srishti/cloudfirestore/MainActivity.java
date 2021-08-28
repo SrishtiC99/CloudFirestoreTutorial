@@ -20,6 +20,7 @@ import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.SetOptions;
@@ -37,6 +38,7 @@ public class MainActivity extends AppCompatActivity {
 
     private EditText titleET;
     private EditText descriptionET;
+    private EditText priorityET;
     private TextView dataTV;
 
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -49,6 +51,7 @@ public class MainActivity extends AppCompatActivity {
 
         titleET = findViewById(R.id.edit_text_title);
         descriptionET = findViewById(R.id.edit_text_description);
+        priorityET = findViewById(R.id.edit_text_priority);
         dataTV = findViewById(R.id.text_view_data);
 
         findViewById(R.id.button_add).setOnClickListener(new View.OnClickListener() {
@@ -79,7 +82,9 @@ public class MainActivity extends AppCompatActivity {
                 for(QueryDocumentSnapshot documentSnapshot : value){
                     Note note = documentSnapshot.toObject(Note.class);
                     note.setId(documentSnapshot.getId());
-                    data += "Id: " + note.getId() + "\n" + "Title: " +  note.getTitle() + "\n" + "Description: " + note.getDescription() + "\n\n";
+                    String priority = String.valueOf(note.getPriority());
+                    data += "Priority: " + priority + "\n" +
+                            "Id: " + note.getId() + "\n" + "Title: " +  note.getTitle() + "\n" + "Description: " + note.getDescription() + "\n\n";
                 }
                 dataTV.setText(data);
             }
@@ -89,7 +94,8 @@ public class MainActivity extends AppCompatActivity {
     public void addNote(){
         String title = titleET.getText().toString();
         String description = descriptionET.getText().toString();
-        Note note = new Note(title, description);
+        String priority = priorityET.getText().toString();
+        Note note = new Note(title, description, Integer.parseInt(priority));
         reference.add(note)
                 .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                     @Override
@@ -106,14 +112,19 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void loadNotes(){
-        reference.get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+        reference.whereGreaterThanOrEqualTo("priority", 2)
+                .limit(3)
+                .orderBy("priority", Query.Direction.DESCENDING)
+                .get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
             @Override
             public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
                 String data = "";
                 for(QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots){
                     Note note = documentSnapshot.toObject(Note.class);
                     note.setId(documentSnapshot.getId());
-                    data += "Id: " + note.getId() + "\n" + "Title: " +  note.getTitle() + "\n" + "Description: " + note.getDescription() + "\n\n";
+                    String priority = String.valueOf(note.getPriority());
+                    data += "Priority: " + priority + "\n" +
+                            "Id: " + note.getId() + "\n" + "Title: " +  note.getTitle() + "\n" + "Description: " + note.getDescription() + "\n\n";
                 }
                 dataTV.setText(data);
             }
