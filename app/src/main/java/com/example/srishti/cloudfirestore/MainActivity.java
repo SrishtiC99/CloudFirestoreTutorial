@@ -1,6 +1,7 @@
 package com.example.srishti.cloudfirestore;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
@@ -14,7 +15,9 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -55,6 +58,27 @@ public class MainActivity extends AppCompatActivity {
                 loadNote();
             }
         });
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        reference.document("Note 1")
+                .addSnapshotListener(this, new EventListener<DocumentSnapshot>() {
+                    @Override
+                    public void onEvent(@Nullable @org.jetbrains.annotations.Nullable DocumentSnapshot value, @Nullable @org.jetbrains.annotations.Nullable FirebaseFirestoreException error) {
+                        if(error != null){
+                            Toast.makeText(MainActivity.this, "Error while loading!", Toast.LENGTH_SHORT).show();
+                            Log.d(TAG, error.toString());
+                            return;
+                        }
+                        if(value.exists()){
+                            Map<String, Object> note = value.getData();
+                            dataTV.setText("Title: " + note.get(KEY_TITLE) + "\n" +
+                                    "Description: " + note.get(KEY_DESCRIPTION));
+                        }
+                    }
+                });
     }
 
     public void saveNote(){
