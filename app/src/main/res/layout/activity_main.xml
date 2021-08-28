@@ -6,7 +6,6 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="16dp"
-    android:gravity="center"
     tools:context=".MainActivity">
 
     <EditText
@@ -34,6 +33,12 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Load" />
+
+    <Button
+        android:id="@+id/button_update_description"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Update Description" />
 
     <TextView
         android:id="@+id/text_view_data"
