@@ -16,6 +16,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.SetOptions;
@@ -65,6 +66,18 @@ public class MainActivity extends AppCompatActivity {
                 updateDescription();
             }
         });
+        findViewById(R.id.button_delete_description).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                deleteDescription();
+            }
+        });
+        findViewById(R.id.button_delete).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                delete();
+            }
+        });
     }
 
     @Override
@@ -83,6 +96,8 @@ public class MainActivity extends AppCompatActivity {
                             Map<String, Object> note = value.getData();
                             dataTV.setText("Title: " + note.get(KEY_TITLE) + "\n" +
                                     "Description: " + note.get(KEY_DESCRIPTION));
+                        }else {
+                            dataTV.setText("");
                         }
                     }
                 });
@@ -144,5 +159,19 @@ public class MainActivity extends AppCompatActivity {
         //reference.document("Note 1").set(note, SetOptions.merge());
         // update
         reference.document("Note 1").update(KEY_DESCRIPTION, description);
+    }
+
+    private void deleteDescription(){
+        reference.document("Note 1").update(KEY_DESCRIPTION, FieldValue.delete());
+        // another method
+        /*Map<String, Object> note = new HashMap<>();
+        note.put(KEY_DESCRIPTION, FieldValue.delete());
+        reference.document("Note 1").update(note);
+
+         */
+    }
+
+    private void delete(){
+        reference.document("Note 1").delete();
     }
 }

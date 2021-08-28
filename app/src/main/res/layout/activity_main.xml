@@ -40,6 +40,18 @@
         android:layout_height="wrap_content"
         android:text="Update Description" />
 
+    <Button
+        android:id="@+id/button_delete_description"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Delete Description" />
+
+    <Button
+        android:id="@+id/button_delete"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Delete" />
+
     <TextView
         android:id="@+id/text_view_data"
         android:layout_width="wrap_content"
