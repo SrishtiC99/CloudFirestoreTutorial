@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "289041401041",
+    "project_id": "cloudfirestore-f58c2",
+    "storage_bucket": "cloudfirestore-f58c2.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:289041401041:android:ac99d5fb98411827cf71f0",
+        "android_client_info": {
+          "package_name": "com.example.srishti.cloudfirestore"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "289041401041-a03vjfj0p8ikgr8sqj011rvmqu7ev8bj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDslbOb3OMFtf3puM_l8k57vRQz8saICcU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "289041401041-a03vjfj0p8ikgr8sqj011rvmqu7ev8bj.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
