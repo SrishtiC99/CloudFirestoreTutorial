@@ -93,9 +93,9 @@ public class MainActivity extends AppCompatActivity {
                             return;
                         }
                         if(value.exists()){
-                            Map<String, Object> note = value.getData();
-                            dataTV.setText("Title: " + note.get(KEY_TITLE) + "\n" +
-                                    "Description: " + note.get(KEY_DESCRIPTION));
+                            Note note = value.toObject(Note.class);
+                            dataTV.setText("Title: " + note.getTitle() + "\n" +
+                                    "Description: " + note.getDescription());
                         }else {
                             dataTV.setText("");
                         }
@@ -106,12 +106,8 @@ public class MainActivity extends AppCompatActivity {
     public void saveNote(){
         String title = titleET.getText().toString();
         String description = descriptionET.getText().toString();
-
-        Map<String, Object> map = new HashMap<>();
-        map.put(KEY_TITLE, title);
-        map.put(KEY_DESCRIPTION, description);
-
-        db.collection("Notebook").document("Note 1").set(map)
+        Note note = new Note(title, description);
+        db.collection("Notebook").document("Note 1").set(note)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void unused) {
@@ -133,9 +129,9 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onSuccess(DocumentSnapshot documentSnapshot) {
                         if(documentSnapshot.exists()){
-                            Map<String, Object> note = documentSnapshot.getData();
-                            dataTV.setText("Title: " + note.get(KEY_TITLE) + "\n" +
-                            "Description: " + note.get(KEY_DESCRIPTION));
+                            Note note = documentSnapshot.toObject(Note.class);
+                            dataTV.setText("Title: " + note.getTitle() + "\n" +
+                            "Description: " + note.getDescription());
 
                         }else {
                             Toast.makeText(MainActivity.this, "Document does not exist", Toast.LENGTH_SHORT).show();
