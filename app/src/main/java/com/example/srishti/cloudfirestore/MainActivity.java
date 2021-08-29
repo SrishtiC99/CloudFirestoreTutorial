@@ -1,43 +1,31 @@
 package com.example.srishti.cloudfirestore;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
-import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
-import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
-import com.google.firebase.firestore.Query;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
-import com.google.firebase.firestore.SetOptions;
 
 import org.jetbrains.annotations.NotNull;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
 
     private static String TAG = "MainActivity";
-    private static String KEY_TITLE = "title";
-    private static String KEY_DESCRIPTION = "description";
 
     private EditText titleET;
     private EditText descriptionET;
@@ -69,7 +57,7 @@ public class MainActivity extends AppCompatActivity {
                 loadNotes();
             }
         });
-
+        dataTV.setText("");
     }
 
     @Override
@@ -81,15 +69,28 @@ public class MainActivity extends AppCompatActivity {
                 if(error != null){
                     return;
                 }
-                String data = "";
-                for(QueryDocumentSnapshot documentSnapshot : value){
-                    Note note = documentSnapshot.toObject(Note.class);
-                    note.setId(documentSnapshot.getId());
-                    String priority = String.valueOf(note.getPriority());
-                    data += "Priority: " + priority + "\n" +
-                            "Id: " + note.getId() + "\n" + "Title: " +  note.getTitle() + "\n" + "Description: " + note.getDescription() + "\n\n";
+                for(DocumentChange dc : value.getDocumentChanges()){
+                    DocumentSnapshot documentSnapshot = dc.getDocument();
+                    String id = documentSnapshot.getId();
+                    int oldIndex = dc.getOldIndex();
+                    int newIndex = dc.getNewIndex();
+
+                    switch (dc.getType()){
+                        case ADDED:
+                            dataTV.setText("\nAdded: " + id +
+                                    "\nOld Index: " + oldIndex + "New Index: " + newIndex);
+                            break;
+                        case MODIFIED:
+                            dataTV.append("\nModified: " + id +
+                                    "\nOld Index: " + oldIndex + "New Index: " + newIndex);
+                            break;
+                        case REMOVED:
+                            dataTV.append("\nRemoved: " + id +
+                                    "\nOld Index: " + oldIndex + "New Index: " + newIndex);
+                            break;
+
+                    }
                 }
-                dataTV.setText(data);
             }
         });
     }
@@ -115,28 +116,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void loadNotes(){
-        Task task1 = reference.whereGreaterThan("priority", 2)
-                .orderBy("priority")
-                .get();
-        Task task2 = reference.whereLessThan("priority", 2)
-                .orderBy("priority")
-                .get();
-        Task<List<QuerySnapshot>> allTasks = Tasks.whenAllSuccess(task1, task2);
-        allTasks.addOnSuccessListener(new OnSuccessListener<List<QuerySnapshot>>() {
-            @Override
-            public void onSuccess(List<QuerySnapshot> querySnapshots) {
-                String data = "";
-                for(QuerySnapshot querySnapshot : querySnapshots){
-                    for(QueryDocumentSnapshot documentSnapshot : querySnapshot){
-                        Note note = documentSnapshot.toObject(Note.class);
-                        note.setId(documentSnapshot.getId());
-                        String priority = String.valueOf(note.getPriority());
-                        data += "Priority: " + priority + "\n" +
-                                "Id: " + note.getId() + "\n" + "Title: " +  note.getTitle() + "\n" + "Description: " + note.getDescription() + "\n\n";
-                    }
-                }
-                dataTV.setText(data);
-            }
-        });
+
     }
 }
