@@ -19,6 +19,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import org.jetbrains.annotations.NotNull;
@@ -57,42 +58,6 @@ public class MainActivity extends AppCompatActivity {
                 loadNotes();
             }
         });
-        dataTV.setText("");
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        reference.addSnapshotListener(this, new EventListener<QuerySnapshot>() {
-            @Override
-            public void onEvent(@Nullable @org.jetbrains.annotations.Nullable QuerySnapshot value, @Nullable @org.jetbrains.annotations.Nullable FirebaseFirestoreException error) {
-                if(error != null){
-                    return;
-                }
-                for(DocumentChange dc : value.getDocumentChanges()){
-                    DocumentSnapshot documentSnapshot = dc.getDocument();
-                    String id = documentSnapshot.getId();
-                    int oldIndex = dc.getOldIndex();
-                    int newIndex = dc.getNewIndex();
-
-                    switch (dc.getType()){
-                        case ADDED:
-                            dataTV.setText("\nAdded: " + id +
-                                    "\nOld Index: " + oldIndex + "New Index: " + newIndex);
-                            break;
-                        case MODIFIED:
-                            dataTV.append("\nModified: " + id +
-                                    "\nOld Index: " + oldIndex + "New Index: " + newIndex);
-                            break;
-                        case REMOVED:
-                            dataTV.append("\nRemoved: " + id +
-                                    "\nOld Index: " + oldIndex + "New Index: " + newIndex);
-                            break;
-
-                    }
-                }
-            }
-        });
     }
 
     public void addNote(){
@@ -100,7 +65,7 @@ public class MainActivity extends AppCompatActivity {
         String description = descriptionET.getText().toString();
         String priority = priorityET.getText().toString();
         Note note = new Note(title, description, Integer.parseInt(priority));
-        reference.add(note)
+        /*reference.add(note)
                 .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                     @Override
                     public void onSuccess(DocumentReference documentReference) {
@@ -113,9 +78,21 @@ public class MainActivity extends AppCompatActivity {
                         Toast.makeText(MainActivity.this, "Error", Toast.LENGTH_SHORT).show();
                     }
                 });
+
+         */
+        reference.document("00s2OLX5OPGqXVTVtg2f").collection("Child Note").add(note);
     }
 
-    private void loadNotes(){
-
+    public void loadNotes(){
+        reference.get()
+                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                    @Override
+                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                        for (QueryDocumentSnapshot dc : queryDocumentSnapshots){
+                            Note note = dc.toObject(Note.class);
+                            note.setId(dc.getId());
+                        }
+                    }
+                });
     }
 }
